@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lazyload 2</title>
+    <style>
+	img {
+	    display: block;
+	    margin-bottom: 50px;
+	    height: 200px;
+	}
+    </style>
+</head>
+<body>
+	<div class="wrap">
+		<label for="debounce">
+			debounce: <input type="text" id="debounce">
+		</label>
+	</div>
+    <img src="images/loading.gif" data-src="images/1.png">
+    <img src="images/loading.gif" data-src="images/2.png">
+    <img src="images/loading.gif" data-src="images/3.png">
+    <img src="images/loading.gif" data-src="images/4.png">
+    <img src="images/loading.gif" data-src="images/5.png">
+    <img src="images/loading.gif" data-src="images/6.png">
+    <img src="images/loading.gif" data-src="images/7.png">
+    <img src="images/loading.gif" data-src="images/8.png">
+    <img src="images/loading.gif" data-src="images/9.png">
+    <script>
+	function throttle(fn, delay, atleast) {
+	    var timeout = null,
+		startTime = new Date();
+	    return function() {
+		var curTime = new Date();
+		clearTimeout(timeout);
+		if(curTime - startTime >= atleast) {
+		    fn();
+		    startTime = curTime;
+		}else {
+		    timeout = setTimeout(fn, delay);
+		}
+	    }
+	}
+	function lazyload() {
+	    var images = document.getElementsByTagName('img');
+	    var len    = images.length;
+	    var n      = 0;      	
+	    return function() {
+		var seeHeight = document.documentElement.clientHeight;
+		var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+		for(var i = n; i < len; i++) {
+		    if(images[i].offsetTop < seeHeight + scrollTop) {
+		        if(images[i].getAttribute('src') === 'images/loading.gif') {
+			     images[i].src = images[i].getAttribute('data-src');
+		        }
+			n = n + 1;
+		     }
+		}
+	    }
+	}
+	var loadImages = lazyload();
+	loadImages();          
+	window.addEventListener('scroll', throttle(loadImages, 500, 1000), false);
+
+
+	// debounce
+	function Run(content) {
+		console.log('偵測: ' + content)
+	}
+
+	function debounce(fun, delay) {
+		return function (args) {
+			clearTimeout(fun.time)
+			fun.time = setTimeout(function () {
+				fun.call(this, args)
+			}, delay)
+		}
+	}
+		
+	let inputDebounce = document.getElementById('debounce')
+
+	let debounceRun = debounce(Run, 500)
+
+	inputDebounce.addEventListener('keyup', function (e) {
+		debounceRun(e.target.value)
+	})
+
+	
+    </script>
+</body>
+</html>
